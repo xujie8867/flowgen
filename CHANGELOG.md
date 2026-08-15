@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.0.1 (2026-08-15)
+
+### 新增
+- **跨平台支持**：README 补充 Windows（PowerShell）与 Linux（桌面 + xvfb）完整安装章节
+- CLI 报错提示跨平台化：Chrome 连不上时同时显示 macOS / Windows 两套启动命令
+- 代理可配置：`FLOW_PROXY` 环境变量适配不同代理工具端口（macOS 1082 / Windows Clash 7890 / Linux v2ray 1080）
+
+### 修复
+- 无（代码逻辑未变更，纯文档与提示完善）
+
+### 说明
+- 核心代码纯 Python，三平台通用；唯一平台差异是 Chrome 启动命令与代理端口
+
 ## v1.0.0 (2026-08-15)
 
 ### 新增
