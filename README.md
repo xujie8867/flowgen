@@ -207,6 +207,11 @@ ffmpeg -y -i video.mp4 -i tts.ogg \
 [▶ 赛博鲸鱼视频（8s）](examples/example_video_whale.mp4)
 *"A giant whale swimming through the clouds above a neon-lit cyberpunk city at night, cinematic camera orbit"*
 
+### 人物开口说中文（Veo 3 原生对话）
+[▶ 花市花艺师对话视频（8s）](examples/example_chinese_dialogue.mp4)
+*"speaks one line in Mandarin Chinese, lips in natural sync: 这束花还带着露水，送给你。"*
+**实测：中文语音 + 口型同步，Veo 3 原生生成，无需外部配音。**
+
 ---
 
 ## 💡 使用心得（作者实测经验）
