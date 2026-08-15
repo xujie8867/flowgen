@@ -39,7 +39,10 @@
 2. **Chrome**（已登录 Google 账号，需能访问 [labs.google/fx/tools/flow](https://labs.google/fx/tools/flow)）
 3. **代理**：如果你在中国大陆，需让 Google 走代理（示例默认 `http://127.0.0.1:1082`）
 
-### 步骤
+> ✅ **跨平台**：核心代码纯 Python（asyncio + websockets + curl），macOS / Windows / Linux 通用。
+> 仅 Chrome 启动命令和安装命令有平台差异，见下方分平台说明。
+
+### macOS / Linux
 
 ```bash
 # 1. 克隆仓库
@@ -61,6 +64,57 @@ ln -sf "$PWD/flowgen.py" ~/.local/bin/flowgen
   --proxy-server=http://127.0.0.1:1082 \
   https://labs.google/fx/tools/flow
 ```
+
+### Windows（PowerShell）
+
+```powershell
+# 1. 克隆仓库
+git clone https://github.com/xujie8867/flowgen.git
+cd flowgen
+
+# 2. 安装依赖（只需 websockets；需已装 Python + uv）
+uv venv --python 3.11 .venv
+uv pip install --python .venv\Scripts\python.exe websockets
+
+# 3. 启动 Chrome（CDP 调试端口；路径按实际安装位置调整）
+& "C:\Program Files\Google\Chrome\Application\chrome.exe" `
+  --remote-debugging-port=9224 `
+  --user-data-dir="$env:USERPROFILE\flowgen-chrome-profile" `
+  --no-first-run `
+  --proxy-server=http://127.0.0.1:1082 `
+  https://labs.google/fx/tools/flow
+
+# 4. 每次生成用 venv 里的 python 运行（或自己建 flowgen.bat 快捷方式）
+.venv\Scripts\python.exe flowgen.py credits
+.venv\Scripts\python.exe flowgen.py image "..." -o out.jpg
+```
+
+> 💡 Windows 想直接输 `flowgen` 命令：把 `flowgen.py` 复制为 `flowgen.bat`，
+> 内容写 `@python "%~dp0flowgen.py" %*`，放在任意 PATH 目录即可。
+
+### Linux（桌面环境）
+
+```bash
+# 1. 克隆仓库 + 安装依赖（同上）
+git clone https://github.com/xujie8867/flowgen.git && cd flowgen
+uv venv --python 3.11 .venv
+uv pip install --python .venv/bin/python websockets
+
+# 2. 启动 Chrome/Chromium（CDP 调试端口；路径按发行版调整）
+google-chrome --remote-debugging-port=9224 \
+  --user-data-dir="$HOME/flowgen-chrome-profile" \
+  --no-first-run --proxy-server=http://127.0.0.1:1082 \
+  https://labs.google/fx/tools/flow
+# 或: chromium-browser / chromium ...
+
+# 3. 运行
+.venv/bin/python flowgen.py credits
+.venv/bin/python flowgen.py image "..." -o out.jpg
+```
+
+> ⚠️ **无显示器服务器**（VPS/容器）：Chrome 需要图形环境执行 reCAPTCHA，
+> 建议装 `xvfb` 虚拟屏：`xvfb-run -a google-chrome ...`；或装带 GUI 的桌面。
+> 纯 headless 模式下 reCAPTCHA 可能无法完成，不推荐。
 
 > ⚠️ **必须**：Chrome 保持打开，且页面停留在 `labs.google/fx/tools/flow`（首次访问会自动创建 Flow 项目）。
 
@@ -150,6 +204,11 @@ flowgen --project 01c43094-xxxx-xxxx-xxxx-xxxxxxxxxxxx video "..." -o out.mp4
 - flow-agent 是现成方案但依赖 Chrome 扩展（Chrome 151+ 命令行禁加载扩展）且有 Python 3.14 兼容 bug
 - 本工具**直接 CDP 连 Chrome 页面**，页面自带 reCAPTCHA 处理，零中间件
 - 自己写 bridge 模拟扩展协议也试过——不如直接页面内 fetch 简单可靠
+
+### 5. 跨平台注意
+- **macOS / Windows / Linux 通用**：核心代码纯 Python，唯一平台差异是 Chrome 启动命令和代理端口
+- 代理端口因工具而异：macOS Shadowrocket 常见 1082，Windows Clash 常见 7890，Linux v2ray 常见 1080——用 `FLOW_PROXY` 环境变量适配即可
+- Linux 服务器无显示器时用 `xvfb-run` 给 Chrome 虚拟屏
 
 ---
 

@@ -72,10 +72,12 @@ def get_page_ws() -> str:
     except Exception:
         raise RuntimeError(
             "Chrome CDP 9224 不可用。请先启动已登录 Flow 的 Chrome:\n"
-            '  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" '
-            '--remote-debugging-port=9224 --user-data-dir="$HOME/flow2api-profiles/chrome-full" '
-            '--profile-directory="Profile 1" --no-first-run --proxy-server=http://127.0.0.1:1082 '
-            "https://labs.google/fx/tools/flow"
+            '  macOS:   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" '
+            '--remote-debugging-port=9224 --user-data-dir="$HOME/flowgen-chrome-profile" '
+            "--no-first-run --proxy-server=http://127.0.0.1:1082 https://labs.google/fx/tools/flow\n"
+            '  Windows: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" '
+            "--remote-debugging-port=9224 --user-data-dir=%USERPROFILE%\\flowgen-chrome-profile "
+            "--no-first-run --proxy-server=http://127.0.0.1:1082 https://labs.google/fx/tools/flow"
         )
     for t in tabs:
         if t.get("type") == "page" and "labs.google" in t.get("url", ""):
