@@ -155,6 +155,36 @@ flowgen --project 01c43094-xxxx-xxxx-xxxx-xxxxxxxxxxxx video "..." -o out.mp4
 
 ---
 
+## 🎙️ 中文配音/对话（Veo 3 原生支持，实测）
+
+### 路线 A：人物开口说中文（口型同步）
+
+```bash
+flowgen video "Slow push-in, locked otherwise. The florist turns toward the camera, holds up a bouquet, and speaks one line in Mandarin Chinese, lips in natural sync: 这束花还带着露水，送给你。 She finishes with a smile. Only her voice, no music, no background voices, no text, no watermark." --start 人物图.png -o out.mp4 --duration 8 --aspect landscape
+```
+
+要点：台词 ≤15 字、角色特写（MCU）、一镜一人、明确 `lips moving in natural sync`。
+
+### 路线 B：中文旁白（本地 TTS + ffmpeg 合成）
+
+Veo 原生旁白不可靠（会读错/重复），旁白用本地中文 TTS + ffmpeg 合成：
+
+```bash
+# 1. Veo 生成画面（prompt 不写台词）
+# 2. 中文 TTS 生成配音（8s 视频 ≈ 30 字以内）
+# 3. 合成（配音为主 + 环境音垫底）
+ffmpeg -y -i video.mp4 -i tts.ogg \
+  -filter_complex "[1:a]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[vo];\
+  [0:a]volume=3.0[amb];[vo][amb]amix=inputs=2:duration=first:dropout_transition=0:weights=1 0.15[out]" \
+  -map 0:v -map "[out]" -c:v copy -c:a aac -b:a 192k out.mp4
+```
+
+### ⚠️ reCAPTCHA 风控
+
+连续生成会触发 403 `PUBLIC_ERROR_UNUSUAL_ACTIVITY`——**生成间隔 ≥90 秒**。v1.0.2 起错误信息会真实显示（不再吞成空错误）。
+
+---
+
 ## 🖼️ 示例
 
 ### 文生图（landscape）

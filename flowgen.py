@@ -157,11 +157,14 @@ class Page:
         r = await self._eval(ws, js, timeout=timeout)
         if "error" in r:
             return {"status": 0, "data": r["error"]}
-        val = json.loads(r["value"])
+        try:
+            val = json.loads(r["value"])
+        except Exception as e:
+            return {"status": 0, "data": f"JS_EVAL_PARSE_FAIL: {e}, raw={r.get('value','')[:200]}"}
         try:
             val["data"] = json.loads(val["data"])
         except Exception:
-            pass
+            pass  # data 可能不是 JSON
         return val
 
     async def solve_captcha(self, ws, action: str) -> str:
